@@ -23,6 +23,8 @@ urlpatterns = [
         name="about",
     ),
     # Django Admin, use {% raw %}{% url 'admin:index' %}{% endraw %}
+    path("jet/", include('jet.urls', 'jet')),  # Django JET URLS
+    path("jet/dashboard/", include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("{{ cookiecutter.project_slug }}.users.urls", namespace="users")),
