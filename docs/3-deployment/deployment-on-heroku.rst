@@ -14,6 +14,7 @@ Run these commands to deploy the project to Heroku:
 
     # Note: this is not a free plan
     heroku addons:create heroku-postgresql:essential-0
+
     # On Windows use double quotes for the time zone, e.g.
     # heroku pg:backups schedule --at "02:00 America/Los_Angeles" DATABASE_URL
     heroku pg:backups schedule --at '02:00 America/Los_Angeles' DATABASE_URL
@@ -23,10 +24,6 @@ Run these commands to deploy the project to Heroku:
 
     # Assuming you chose Mailgun as mail service (see below for others)
     heroku addons:create mailgun:starter
-
-    heroku config:set PYTHONHASHSEED=random
-
-    heroku config:set WEB_CONCURRENCY=4
 
     heroku config:set DJANGO_DEBUG=False
     heroku config:set DJANGO_SETTINGS_MODULE=config.settings.production
@@ -65,7 +62,7 @@ The script above assumes that you've chose Mailgun as email service. If you want
 
 .. warning::
 
-    .. include:: mailgun.rst
+    .. include:: ../includes/mailgun.rst
 
 Heroku & Docker
 +++++++++++++++
@@ -86,8 +83,6 @@ it's in the ``Procfile``, but is turned off by default:
 
 .. code-block:: bash
 
-    # Set the broker URL to Redis
-    heroku config:set CELERY_BROKER_URL=`heroku config:get REDIS_URL`
     # Scale dyno to 1 instance
     heroku ps:scale worker=1
 

@@ -1,5 +1,5 @@
 {% if cookiecutter.frontend_pipeline in ['Gulp', 'Webpack'] -%}
-FROM docker.io/node:20-bookworm-slim AS client-builder
+FROM docker.io/node:22.14-bookworm-slim AS client-builder
 
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}
@@ -25,7 +25,7 @@ RUN npm run build
 
 {%- endif %}
 # define an alias for the specific python version used in this file.
-FROM docker.io/python:3.12.6-slim-bookworm AS python
+FROM docker.io/python:3.12.9-slim-bookworm AS python
 
 # Python build stage
 FROM python AS python-build-stage
@@ -38,6 +38,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   build-essential \
   # psycopg dependencies
   libpq-dev
+
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements .
@@ -60,7 +61,7 @@ ENV BUILD_ENV=${BUILD_ENVIRONMENT}
 WORKDIR ${APP_HOME}
 
 RUN addgroup --system django \
-    && adduser --system --ingroup django django
+  && adduser --system --ingroup django django
 
 
 # Install required system dependencies
@@ -69,6 +70,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   libpq-dev \
   # Translations dependencies
   gettext \
+  # entrypoint
+  wait-for-it \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
@@ -122,9 +125,6 @@ RUN chown -R django:django ${APP_HOME}
 USER django
 
 RUN DATABASE_URL="" \
-  {%- if cookiecutter.use_celery == "y" %}
-  CELERY_BROKER_URL="" \
-  {%- endif %}
   DJANGO_SETTINGS_MODULE="config.settings.test" \
   python manage.py compilemessages
 
